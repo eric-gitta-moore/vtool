@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>电子印章生成器 - vtool工具箱</title>
+    <meta name="keywords" content="免费印章生成，公章生成器，印章在线制作，在线印章生成器，395印章">
+    <meta name="description" content="电子印章在线生成器，可通过自定义配置在线制作各种印章、公章。一键生成电子印章，支持下载到本地。">
+    <link href="pico.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Noto+Serif+SC:wght@300;400;500;600;700;800;900&display=swap">
+    <style>
+        :root {
+            font-size: 0.75em;
+        }
+        @media (min-width: 576px) {
+            .container {
+                max-width:570px;
+                padding-right: 0;
+                padding-left: 0
+            }
+            .flex-wrap {
+                -ms-flex-wrap: wrap !important;
+                flex-wrap: wrap !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .container {
+                max-width:760px
+            }
+            .flex-wrap {
+                -ms-flex-wrap: wrap !important;
+                flex-wrap: wrap !important;
+            }
+        }
+        @media (min-width: 992px) {
+            .container {
+                max-width:980px
+            }
+            .flex-wrap {
+                -ms-flex-wrap: nowrap !important;
+                flex-wrap: nowrap !important;
+            }
+        }
+        @media (min-width: 1200px) {
+            .container {
+                max-width:1130px
+            }
+            .flex-wrap {
+                -ms-flex-wrap: nowrap !important;
+                flex-wrap: nowrap !important;
+            }
+        }
+        .d-flex {
+            display: -ms-flexbox !important;
+            display: flex !important;
+        }
+        .flex-item{
+            flex: 2;
+        }
+        .flex-half{
+            flex: 1 !important;
+        }
+        .d-none {
+            display: none !important;
+        }
+        .justify-content-start {
+            -ms-flex-pack: start !important;
+            justify-content: flex-start !important;
+        }
+        .text-center {
+            text-align: center !important;
+        }
+        #seal{
+            padding: 1.2rem;
+        }
+        .s-box{
+            border: 1px solid #f0f0f0;
+        }
+        #config{
+            width: 100%;
+            padding: 1.2rem;
+            border-left: 1px solid #f0f0f0;
+        }
+        .ml-2{
+            margin-left: 0.5rem !important;
+        }
+        .mt-5{
+            margin-top: 1.25rem !important;
+        }
+        .switch-set{
+            padding: var(--form-element-spacing-vertical) var(--form-element-spacing-horizontal);
+        }
+        .cfg-label{
+            color: var(--h5-color);
+            font-weight: 700;
+            font-size: 1.125rem;
+            font-family: var(--font-family);
+            margin-bottom: calc(var(--spacing) * .5);
+        }
+        .cfg-content{
+            margin-top: 0.25rem;
+        }
+        .noisy-config{
+            width: 50%;
+        }
+        #mask {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        #mask .loader {
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #3498db;
+            width: 50px;
+            height: 50px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+<div id="mask" class="d-none">
+    <div class="loader"></div>
+</div>
+<nav class="container mt-5">
+    <ul>
+        <li>
+            <a href="/" aria-label="Back home">
+                vtool.pro
+            </a>
+        </li>
+    </ul>
+</nav>
+<main class="container">
+    <h1 style="text-align: center;">电子印章生成器</h1>
+    <div>郑重声明：本工具生成的印章仅供个人学习娱乐使用，请勿用于非法用途，否则后果自负！</div>
+    <div class="d-flex flex-wrap s-box">
+        <div class="p-3">
+            <div id="seal"></div>
+            <div class="text-center">
+                <a href="javascript: void(0);" role="button" class="outline download-btn">下载印章</a>
+                <a href="javascript: void(0);" role="button" class="outline save-btn">存为模板</a>
+            </div>
+        </div>
+        <div id="config">
+            <div class="d-flex"><h4>配置面板</h4></div>
+            <div style="overflow: auto; height: calc(100vh - 310px); min-height: 300px;">
+                <div>
+                    <div class="cfg-label">基本配置</div>
+                    <div class="d-flex justify-content-start flex-wrap">
+                        <div class="d-none">
+                            <label>印章类型</label>
+                            <select class="seal-type" required>
+                                <option value="company" selected="selected">公司公章</option>
+                                <option value="person">个人私章</option>
+                            </select>
+                        </div>
+                        <div class="ml-2">
+                            <label>印章形状</label>
+                            <select class="seal-shape" required>
+                                <option selected="selected" value="circle">圆形</option>
+                                <option value="ellipse">椭圆</option>
+                                <option value="square" disabled="disabled">方形</option>
+                            </select>
+                        </div>
+                        <div class="ml-2">
+                            <label>选择模板</label>
+                            <select class="seal-template" required>
+                                <option selected="selected" value="">保存后可选</option>
+                            </select>
+                        </div>
+                        <div class="ml-2">
+                            <label>加背景</label>
+                            <fieldset class="switch-set">
+                                <input class="show-transparent" type="checkbox" checked="checked" name="switch" role="switch">
+                            </fieldset>
+                        </div>
+                        <div class="ml-2">
+                            <label>边框划痕</label>
+                            <fieldset class="switch-set">
+                                <input class="show-breaks" type="checkbox" name="switch" role="switch">
+                            </fieldset>
+                        </div>
+                        <div class="ml-2">
+                            <label>
+                                印章颜色
+                            </label>
+                            <input class="seal-color" type="color" name="color" value="#ff0000">
+                        </div>
+                        <div class="ml-2">
+                            <label>字体</label>
+                            <select class="font-family" required>
+                                <option selected="selected" value="Noto Serif SC">思源宋体</option>
+                                <option value="@长城宋体.woff2">长城宋体</option>
+                                <option value="@长城小标宋体.woff2">长城小标宋体</option>
+                                <option value="@长城大标宋体.woff2">长城大标宋体</option>
+                                <option value="@长城仿宋体.woff2">长城仿宋体</option>
+                                <option value="@长城长宋体.woff2">长城长宋体</option>
+                                <option value="@长城细仿宋体.woff2">长城细仿宋体</option>
+                                <option value="@长城特粗宋体.woff2">长城特粗宋体</option>
+                                <option value="@长城报宋体.woff2">长城报宋体</option>
+                                <option value="@长城书宋体繁.woff2">长城书宋体繁</option>
+                            </select>
+                        </div>
+                        <div class="ml-2">
+                            <label>画布尺寸</label>
+                            <input type="text" placeholder="300 X 300" disabled="disabled">
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">老化效果</div><label class="ml-2"><input class="noisy-switch" type="checkbox" name="switch" role="switch"></label>
+                    </div>
+                    <div class="cfg-content noisy-config d-none">
+                        <input type="range" min="0" max="95" value="20" name="noisy">
+                    </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">主文字配置</div><label class="ml-2"><input class="text-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content text-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div class="flex-half">
+                                <label>
+                                    文字颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2 flex-item">
+                                <label>文案</label>
+                                <input name="text" type="text" value="中国宇宙印章科技有限责任公司">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体大小</label>
+                                <input name="size" type="number" value="30">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>半径</label>
+                                <input name="radius" type="number" value="120">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>开始角度</label>
+                                <input name="degree" type="number" value="25">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体粗细</label>
+                                <input name="weight" type="number" step="100" value="600" min="300" max="900">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体拉伸</label>
+                                <input name="scaleY" type="number" step="1" value="0" min="0" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">副文字配置</div><label class="ml-2"><input class="sub-text-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content sub-text-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div class="flex-half">
+                                <label>
+                                    文字颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2 flex-item">
+                                <label>文案</label>
+                                <input name="text" type="text" value="朋友专用章">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体大小</label>
+                                <input name="size" type="number" value="24">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>间距</label>
+                                <input name="distance" type="number" value="75">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体粗细</label>
+                                <input name="weight" type="number" step="100" value="600" min="300" max="900">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体拉伸</label>
+                                <input name="scaleY" type="number" step="1" value="0" min="0" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">序列号配置</div><label class="ml-2"><input class="serNo-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content serNo-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div class="flex-half">
+                                <label>
+                                    文字颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2 flex-item">
+                                <label>文案</label>
+                                <input name="text" type="text" value="01234566667890">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体大小</label>
+                                <input name="size" type="number" value="18">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>半径</label>
+                                <input name="radius" type="number" value="120">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>开始角度</label>
+                                <input name="degree" type="number" value="45">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体粗细</label>
+                                <input name="weight" type="number" step="100" value="600" min="300" max="900">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体拉伸</label>
+                                <input name="scaleY" type="number" step="1" value="0" min="0" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">中心文字配置</div><label class="ml-2"><input class="center-text-switch" type="checkbox" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content center-text-config d-none">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div class="flex-half">
+                                <label>
+                                    文字颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2 flex-item">
+                                <label>文案</label>
+                                <input name="text" type="text" value="测试文案">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体大小</label>
+                                <input name="size" type="number" value="24">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体粗细</label>
+                                <input name="weight" type="number" step="100" value="600" min="300" max="900">
+                            </div>
+                            <div class="ml-2 flex-half">
+                                <label>字体拉伸</label>
+                                <input name="scaleY" type="number" step="1" value="0" min="0" max="10">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">边线配置</div><label class="ml-2"><input class="border-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content border-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div>
+                                <label>
+                                    边线颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2">
+                                <label>线宽</label>
+                                <input type="number" name="width" value="6">
+                            </div>
+                            <div class="ml-2">
+                                <label>半径</label>
+                                <input type="number" name="radius" value="140">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">内边线配置</div><label class="ml-2"><input class="inner-border-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content inner-border-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div>
+                                <label>
+                                    边线颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2">
+                                <label>线宽</label>
+                                <input name="width" type="number" value="1">
+                            </div>
+                            <div class="ml-2">
+                                <label>半径</label>
+                                <input name="radius" type="number" value="130">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">内环线配置</div><label class="ml-2"><input class="inner-line-switch" type="checkbox" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content inner-line-config d-none">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div>
+                                <label>
+                                    边线颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2">
+                                <label>线宽</label>
+                                <input name="width" type="number" value="2">
+                            </div>
+                            <div class="ml-2">
+                                <label>半径</label>
+                                <input class="radius" type="number" value="80">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="d-flex">
+                        <div class="cfg-label">五角星配置</div><label class="ml-2"><input class="five-star-switch" type="checkbox" checked="checked" name="switch" role="switch">是否显示</label>
+                    </div>
+                    <div class="cfg-content five-star-config">
+                        <div class="d-flex justify-content-start flex-wrap">
+                            <div>
+                                <label>
+                                    背景颜色
+                                </label>
+                                <input type="color" name="color" value="#ff0000">
+                            </div>
+                            <div class="ml-2">
+                                <label>大小</label>
+                                <input name="size" type="number" value="30">
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<div style="text-align: center;margin: 10px;">电子印章在线制作</div>
+<script defer="defer" src="main.b740f023.js"></script></body>
+</html>
