@@ -7,3 +7,4 @@
 - [在线预览&打印markdown](http://coolaf.com/zh/tool/md)
 - [自动添加行号](https://tooltt.com/addnum/)
 - [v2ray clash 订阅转换工具](https://v1.v2rayse.com/v2ray-clash/)
+- [Markdown 表格在线格式化工具](https://mdformatter.dswwsd.net/)
